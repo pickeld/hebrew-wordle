@@ -35,7 +35,7 @@ export function Tile({ letter, state, index, revealed = false }: TileProps) {
     if (revealed && state !== 'empty' && state !== 'tbd') {
       Animated.sequence([
         Animated.delay(index * 120),
-        Animated.timing(flipAnim, { toValue: 1, duration: 280, useNativeDriver: true }),
+        Animated.timing(flipAnim, { toValue: 1, duration: 280, useNativeDriver: false }),
       ]).start();
     }
   }, [revealed, state]);
@@ -44,8 +44,8 @@ export function Tile({ letter, state, index, revealed = false }: TileProps) {
     if (letter && letter !== prevLetter.current && state === 'tbd') {
       prevLetter.current = letter;
       Animated.sequence([
-        Animated.timing(scaleAnim, { toValue: 1.12, duration: 70, useNativeDriver: true }),
-        Animated.timing(scaleAnim, { toValue: 1, duration: 70, useNativeDriver: true }),
+        Animated.timing(scaleAnim, { toValue: 1.12, duration: 70, useNativeDriver: false }),
+        Animated.timing(scaleAnim, { toValue: 1, duration: 70, useNativeDriver: false }),
       ]).start();
     }
   }, [letter]);
