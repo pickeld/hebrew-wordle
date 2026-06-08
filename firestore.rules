@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Users ────────────────────────────────────────────────────────────────
+    // Users can read any profile, but only write their own
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+                            && request.auth.uid == userId
+                            && validUserStats();
+      allow delete: if false;
+    }
+
+    // ─── Daily Scores ─────────────────────────────────────────────────────────
+    // Anyone can read. Authenticated users can write their own score once per day.
+    match /dailyScores/{scoreId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.auth.uid == resource.data.uid
+                    && scoreId == request.auth.uid + '_' + request.resource.data.date
+                    && validDailyScore();
+      allow update: if false; // scores are immutable
+      allow delete: if false;
+    }
+
+    // ─── Challenges ───────────────────────────────────────────────────────────
+    // Authenticated users can create and read challenges.
+    // Only participants can update (submit their result).
+    match /challenges/{challengeId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.creatorId == request.auth.uid
+                    && validChallenge();
+      allow update: if request.auth != null
+                    && onlyAddingParticipant();
+      allow delete: if request.auth != null
+                    && resource.data.creatorId == request.auth.uid;
+    }
+
+    // ─── Tournaments ──────────────────────────────────────────────────────────
+    // Read-only for users. Only admins can create/modify tournaments.
+    match /tournaments/{tournamentId} {
+      allow read: if true;
+      allow create, update, delete: if false; // admin only via Firebase console
+    }
+
+    // ─── Helper functions ─────────────────────────────────────────────────────
+    function validUserStats() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['uid', 'displayName', 'streak', 'maxStreak', 'gamesPlayed', 'gamesWon', 'guessDistribution'])
+          && data.uid is string
+          && data.displayName is string
+          && data.streak is int && data.streak >= 0
+          && data.maxStreak is int && data.maxStreak >= 0
+          && data.gamesPlayed is int && data.gamesPlayed >= 0
+          && data.gamesWon is int && data.gamesWon >= 0;
+    }
+
+    function validDailyScore() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['uid', 'displayName', 'date', 'guesses', 'timeSeconds', 'won'])
+          && data.uid == request.auth.uid
+          && data.guesses is int && data.guesses >= 1 && data.guesses <= 7
+          && data.timeSeconds is int && data.timeSeconds >= 0
+          && data.won is bool;
+    }
+
+    function validChallenge() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['creatorId', 'creatorName', 'word', 'createdAt', 'participants'])
+          && data.creatorId == request.auth.uid
+          && data.word is string && data.word.size() == 5
+          && data.participants is list && data.participants.size() == 0;
+    }
+
+    function onlyAddingParticipant() {
+      // Only allow arrayUnion on participants field, nothing else changes
+      let before = resource.data;
+      let after = request.resource.data;
+      return after.diff(before).affectedKeys().hasOnly(['participants'])
+          && after.participants.size() == before.participants.size() + 1;
+    }
+  }
+}
