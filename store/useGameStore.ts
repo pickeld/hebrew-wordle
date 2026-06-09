@@ -1,41 +1,10 @@
 import { create } from 'zustand';
 import type { LetterState } from '../types';
 import { getDailyWord, isValidWord } from '../constants/words';
+import { israelDateStr } from '../lib/time';
+import { evaluateGuess, WORD_LENGTH } from '../lib/evaluate';
 
 const MAX_GUESSES = 6;
-const WORD_LENGTH = 5;
-
-function getTodayStr(): string {
-  const now = new Date();
-  const israelTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
-  return israelTime.toISOString().split('T')[0];
-}
-
-function evaluateGuess(guess: string, solution: string): LetterState[] {
-  const result: LetterState[] = Array(WORD_LENGTH).fill('absent');
-  const solutionChars = solution.split('');
-  const guessChars = guess.split('');
-
-  // Pass 1: correct positions (green)
-  guessChars.forEach((char, i) => {
-    if (char === solutionChars[i]) {
-      result[i] = 'correct';
-      solutionChars[i] = '#';
-    }
-  });
-
-  // Pass 2: present but wrong position (yellow)
-  guessChars.forEach((char, i) => {
-    if (result[i] === 'correct') return;
-    const idx = solutionChars.indexOf(char);
-    if (idx !== -1) {
-      result[i] = 'present';
-      solutionChars[idx] = '#';
-    }
-  });
-
-  return result;
-}
 
 interface GameStore {
   solution: string;
@@ -53,7 +22,7 @@ interface GameStore {
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
-  solution: getDailyWord(getTodayStr()),
+  solution: getDailyWord(israelDateStr()),
   guesses: [],
   currentGuess: '',
   gameStatus: 'playing',
@@ -150,7 +119,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   resetGame: () => {
     set({
-      solution: getDailyWord(getTodayStr()),
+      solution: getDailyWord(israelDateStr()),
       guesses: [],
       currentGuess: '',
       gameStatus: 'playing',

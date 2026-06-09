@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useGameStore } from '../store/useGameStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { submitDailyScore, upsertUserStats, getUserStats } from '../firebase/firestore';
+import { israelDateStr } from '../lib/time';
 
 export function useGame() {
   const store = useGameStore();
@@ -12,7 +13,9 @@ export function useGame() {
     if (!user) return;
 
     const elapsed = Math.floor((Date.now() - store.startTime) / 1000);
-    const date = new Date().toISOString().split('T')[0];
+    // Key the score to the same Israel-day the daily word is drawn from, so a
+    // game finished just after local midnight still lands on the right puzzle.
+    const date = israelDateStr();
     const won = store.gameStatus === 'won';
     const guessCount = store.guesses.length;
 

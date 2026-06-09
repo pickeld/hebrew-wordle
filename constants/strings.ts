@@ -12,11 +12,32 @@ export const STRINGS = {
   youLost: 'כמעט!',
   theSolutionWas: 'המילה הייתה',
   shareResult: 'שתף תוצאה',
+  resultCopied: 'התוצאה הועתקה ללוח',
+  shareFailed: 'השיתוף נכשל',
   playAgain: 'שחק שוב',
   notAWord: 'לא מילה תקנית',
   tooShort: 'המילה קצרה מדי',
   watchAdForHint: 'צפה בפרסומת לרמז',
   hintRevealed: 'האות שנחשפה',
+  hintTitle: 'רוצה רמז?',
+  hintPrompt: 'צפה בסרטון קצר כדי לחשוף אות אחת',
+  watchAd: 'צפה בפרסומת',
+  cancel: 'ביטול',
+  close: 'סגור',
+  gotIt: 'הבנתי!',
+
+  // How-to-play / onboarding
+  howToTitle: 'איך משחקים',
+  howToIntro: 'נחשו את מילת היום בת 5 האותיות בתוך 6 ניסיונות. כל ניחוש חייב להיות מילה תקנית.',
+  howToCorrect: 'האות נמצאת במילה ובמקום הנכון.',
+  howToPresent: 'האות נמצאת במילה אך במקום אחר.',
+  howToAbsent: 'האות אינה נמצאת במילה כלל.',
+  howToFooter: 'מילה חדשה מחכה לכם בכל יום!',
+
+  // Post-game / next puzzle
+  nextWordIn: 'המילה הבאה בעוד',
+  viewResult: 'הצג תוצאה',
+  gameOver: 'סיימת להיום',
   signIn: 'כניסה עם גוגל',
   signOut: 'יציאה',
   daily: 'יומי',
@@ -32,4 +53,13 @@ export const STRINGS = {
   joinChallenge: 'הצטרף לאתגר',
   challengeCode: 'קוד אתגר',
   joinTournament: 'הצטרף לטורניר',
+
+  // Accessibility labels (screen readers)
+  a11ySubmit: 'אישור הניחוש',
+  a11yDelete: 'מחק אות',
+  a11yHint: 'צפה בפרסומת לקבלת רמז',
+  a11yShare: 'שתף את התוצאה',
+  a11yClose: 'סגור',
+  a11yHelp: 'איך משחקים',
+  a11yViewResult: 'הצג שוב את תוצאת המשחק',
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text } from 'react-native';
-import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { COLORS, FONTS, SIZES, SHADOWS } from '../constants/theme';
 import type { LetterState } from '../types';
 
 const STATE_BG: Record<LetterState, string> = {
@@ -16,7 +16,16 @@ const STATE_BORDER: Record<LetterState, string> = {
   present: COLORS.present,
   absent: COLORS.absent,
   empty: COLORS.border,
-  tbd: COLORS.textSecondary,
+  tbd: COLORS.accentDim,
+};
+
+// Hebrew descriptions read aloud by screen readers for each graded tile.
+const STATE_A11Y: Record<LetterState, string> = {
+  correct: 'במקום הנכון',
+  present: 'במילה אך במקום שגוי',
+  absent: 'לא במילה',
+  empty: '',
+  tbd: '',
 };
 
 interface TileProps {
@@ -24,54 +33,112 @@ interface TileProps {
   state: LetterState;
   index: number;
   revealed?: boolean;
+  /** True when this tile is part of the winning row (triggers a celebratory bounce). */
+  win?: boolean;
 }
 
-export function Tile({ letter, state, index, revealed = false }: TileProps) {
+export function Tile({ letter, state, index, revealed = false, win = false }: TileProps) {
   const flipAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const popAnim = useRef(new Animated.Value(1)).current;
+  const bounceAnim = useRef(new Animated.Value(0)).current;
   const prevLetter = useRef('');
 
+  // Flip-to-reveal once a row is submitted.
   useEffect(() => {
     if (revealed && state !== 'empty' && state !== 'tbd') {
       Animated.sequence([
-        Animated.delay(index * 120),
-        Animated.timing(flipAnim, { toValue: 1, duration: 280, useNativeDriver: false }),
+        Animated.delay(index * 130),
+        Animated.timing(flipAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: false,
+        }),
       ]).start();
+    } else {
+      flipAnim.setValue(0);
     }
   }, [revealed, state]);
 
+  // Pop the tile when a new letter is typed into it.
   useEffect(() => {
     if (letter && letter !== prevLetter.current && state === 'tbd') {
       prevLetter.current = letter;
       Animated.sequence([
-        Animated.timing(scaleAnim, { toValue: 1.12, duration: 70, useNativeDriver: false }),
-        Animated.timing(scaleAnim, { toValue: 1, duration: 70, useNativeDriver: false }),
+        Animated.spring(popAnim, {
+          toValue: 1.14,
+          speed: 50,
+          bounciness: 14,
+          useNativeDriver: false,
+        }),
+        Animated.spring(popAnim, {
+          toValue: 1,
+          speed: 40,
+          bounciness: 10,
+          useNativeDriver: false,
+        }),
       ]).start();
     }
+    if (!letter) prevLetter.current = '';
   }, [letter]);
+
+  // Celebratory bounce wave across the winning row.
+  useEffect(() => {
+    if (win) {
+      Animated.sequence([
+        Animated.delay(index * 90 + 350),
+        Animated.spring(bounceAnim, {
+          toValue: 1,
+          speed: 18,
+          bounciness: 22,
+          useNativeDriver: false,
+        }),
+        Animated.spring(bounceAnim, {
+          toValue: 0,
+          speed: 14,
+          bounciness: 12,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  }, [win]);
 
   const bgColor = flipAnim.interpolate({
     inputRange: [0, 0.49, 0.5, 1],
     outputRange: ['transparent', 'transparent', STATE_BG[state], STATE_BG[state]],
   });
 
-  const rotateY = flipAnim.interpolate({
+  const rotateX = flipAnim.interpolate({
     inputRange: [0, 0.5, 1],
     outputRange: ['0deg', '90deg', '0deg'],
   });
 
+  const translateY = bounceAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -22],
+  });
+
+  // While typing, give the filled (tbd) tile a slightly stronger border.
+  const isFilled = state === 'tbd' && !!letter;
+
+  // Only graded tiles convey meaning to screen readers; empty/typing tiles stay silent.
+  const a11yDesc = revealed ? STATE_A11Y[state] : '';
+  const a11yLabel = letter && a11yDesc ? `${letter}, ${a11yDesc}` : letter || undefined;
+
   return (
     <Animated.View
+      accessible={!!a11yLabel}
+      accessibilityLabel={a11yLabel}
       style={[
         styles.tile,
+        win && SHADOWS.glow,
         {
-          borderColor: STATE_BORDER[state],
+          borderColor: isFilled ? COLORS.textSecondary : STATE_BORDER[state],
           backgroundColor: bgColor,
           transform: [
-            { scaleX: scaleAnim },
-            { scaleY: scaleAnim },
             { perspective: 1000 },
-            { rotateY },
+            { scale: popAnim },
+            { translateY },
+            { rotateX },
           ],
         },
       ]}
@@ -92,9 +159,11 @@ const styles = StyleSheet.create({
     margin: SIZES.tileGap / 2,
   },
   letter: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '700',
     color: COLORS.text,
     fontFamily: FONTS.bold,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
 });
