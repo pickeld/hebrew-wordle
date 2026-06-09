@@ -22,6 +22,15 @@ export const STRINGS = {
   watchAd: 'צפה בפרסומת',
   cancel: 'ביטול',
   close: 'סגור',
+  gotIt: 'הבנתי!',
+
+  // How-to-play / onboarding
+  howToTitle: 'איך משחקים',
+  howToIntro: 'נחשו את מילת היום בת 5 האותיות בתוך 6 ניסיונות. כל ניחוש חייב להיות מילה תקנית.',
+  howToCorrect: 'האות נמצאת במילה ובמקום הנכון.',
+  howToPresent: 'האות נמצאת במילה אך במקום אחר.',
+  howToAbsent: 'האות אינה נמצאת במילה כלל.',
+  howToFooter: 'מילה חדשה מחכה לכם בכל יום!',
   signIn: 'כניסה עם גוגל',
   signOut: 'יציאה',
   daily: 'יומי',
@@ -44,4 +53,5 @@ export const STRINGS = {
   a11yHint: 'צפה בפרסומת לקבלת רמז',
   a11yShare: 'שתף את התוצאה',
   a11yClose: 'סגור',
+  a11yHelp: 'איך משחקים',
 };

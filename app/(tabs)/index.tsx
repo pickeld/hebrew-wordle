@@ -9,6 +9,7 @@ import { HebrewKeyboard } from '../../components/HebrewKeyboard';
 import { AdBanner } from '../../components/AdBanner';
 import { GameResultModal } from '../../components/GameResultModal';
 import { HintDialog } from '../../components/HintDialog';
+import { HowToPlayModal } from '../../components/HowToPlayModal';
 import { useGame } from '../../hooks/useGame';
 import { showRewarded, showInterstitial } from '../../admob/ads';
 import { COLORS, FONTS, RADIUS, SPACING } from '../../constants/theme';
@@ -20,6 +21,7 @@ export default function HomeScreen() {
   const { gameStatus, guesses, addLetter, deleteLetter, submitGuess, revealHint } = useGame();
   const [showResult, setShowResult] = useState(false);
   const [showHintDialog, setShowHintDialog] = useState(false);
+  const [showHowTo, setShowHowTo] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const toastOpacity = useRef(new Animated.Value(0)).current;
   const toastTranslate = useRef(new Animated.Value(-12)).current;
@@ -87,6 +89,15 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
+        <Pressable
+          style={({ pressed }) => [styles.helpBtn, pressed && styles.helpBtnPressed]}
+          onPress={() => setShowHowTo(true)}
+          accessibilityRole="button"
+          accessibilityLabel={STRINGS.a11yHelp}
+          hitSlop={10}
+        >
+          <Text style={styles.helpBtnText}>?</Text>
+        </Pressable>
         <View style={styles.titleRow}>
           <View style={styles.titleAccent} />
           <Text style={styles.appName}>{STRINGS.appName}</Text>
@@ -150,6 +161,9 @@ export default function HomeScreen() {
       {/* Banner ad */}
       <AdBanner />
 
+      {/* How-to-play onboarding */}
+      <HowToPlayModal visible={showHowTo} onClose={() => setShowHowTo(false)} />
+
       {/* Hint confirmation dialog */}
       <HintDialog
         visible={showHintDialog}
@@ -170,6 +184,27 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   header: { alignItems: 'center', paddingTop: SPACING.sm, paddingBottom: SPACING.sm },
+  helpBtn: {
+    position: 'absolute',
+    left: SPACING.lg,
+    top: SPACING.sm,
+    width: 32,
+    height: 32,
+    borderRadius: RADIUS.pill,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surfaceAlt,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  helpBtnPressed: { opacity: 0.6 },
+  helpBtnText: {
+    color: COLORS.textSecondary,
+    fontSize: 17,
+    fontFamily: FONTS.bold,
+    includeFontPadding: false,
+  },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   titleAccent: {
     width: 22,
