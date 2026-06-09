@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, FONTS } from '../../constants/theme';
 import { STRINGS } from '../../constants/strings';
 import { getDailyLeaderboard } from '../../firebase/firestore';
+import { israelDateStr } from '../../lib/time';
 import { AdBanner } from '../../components/AdBanner';
 import type { DailyScore } from '../../types';
 
@@ -17,7 +18,7 @@ export default function LeaderboardScreen() {
   const [scores, setScores] = useState<DailyScore[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = israelDateStr();
 
   useEffect(() => {
     load();

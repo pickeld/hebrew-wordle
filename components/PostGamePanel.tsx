@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { COLORS, FONTS, RADIUS, SPACING } from '../constants/theme';
 import { STRINGS } from '../constants/strings';
@@ -21,6 +21,13 @@ export function PostGamePanel({ onViewResult }: Props) {
   const { gameStatus, solution, guesses } = useGameStore();
   const won = gameStatus === 'won';
   const countdown = useNextPuzzleCountdown(true);
+  const [shareNote, setShareNote] = useState('');
+
+  async function handleShare() {
+    const outcome = await shareResult(solution, guesses, won);
+    if (outcome === 'copied') setShareNote(STRINGS.resultCopied);
+    else if (outcome === 'failed') setShareNote(STRINGS.shareFailed);
+  }
 
   return (
     <View style={styles.panel}>
@@ -43,13 +50,19 @@ export function PostGamePanel({ onViewResult }: Props) {
 
         <Pressable
           style={({ pressed }) => [styles.btnSecondary, pressed && styles.pressed]}
-          onPress={() => shareResult(solution, guesses, won)}
+          onPress={handleShare}
           accessibilityRole="button"
           accessibilityLabel={STRINGS.a11yShare}
         >
           <Text style={styles.btnSecondaryText}>📤 {STRINGS.shareResult}</Text>
         </Pressable>
       </View>
+
+      {shareNote !== '' && (
+        <Text style={styles.shareNote} accessibilityLiveRegion="polite">
+          {shareNote}
+        </Text>
+      )}
     </View>
   );
 }
@@ -107,5 +120,12 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   btnSecondaryText: { color: COLORS.text, fontFamily: FONTS.semiBold, fontSize: 15 },
+  shareNote: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+    fontFamily: FONTS.regular,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+  },
   pressed: { opacity: 0.8 },
 });

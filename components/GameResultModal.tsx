@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { COLORS, FONTS, RADIUS, SPACING, SHADOWS } from '../constants/theme';
 import { STRINGS } from '../constants/strings';
 import { useGameStore } from '../store/useGameStore';
-import { tileEmoji, shareResult } from '../lib/share';
+import { rowEmoji, shareResult } from '../lib/share';
 import { useNextPuzzleCountdown } from '../lib/time';
 
 interface Props {
@@ -19,6 +19,12 @@ export function GameResultModal({ visible, onClose, timeSeconds }: Props) {
   const scale = useRef(new Animated.Value(0.8)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const countdown = useNextPuzzleCountdown(visible);
+  const [shareNote, setShareNote] = useState('');
+
+  // Clear any prior share feedback whenever the modal re-opens.
+  useEffect(() => {
+    if (visible) setShareNote('');
+  }, [visible]);
 
   useEffect(() => {
     if (visible) {
@@ -32,7 +38,9 @@ export function GameResultModal({ visible, onClose, timeSeconds }: Props) {
   }, [visible]);
 
   async function handleShare() {
-    await shareResult(solution, guesses, won);
+    const outcome = await shareResult(solution, guesses, won);
+    if (outcome === 'copied') setShareNote(STRINGS.resultCopied);
+    else if (outcome === 'failed') setShareNote(STRINGS.shareFailed);
   }
 
   const mins = Math.floor(timeSeconds / 60);
@@ -61,7 +69,7 @@ export function GameResultModal({ visible, onClose, timeSeconds }: Props) {
             <View style={styles.recap}>
               {guesses.map((g, gi) => (
                 <Text key={gi} style={styles.recapRow}>
-                  {[...g].map((ch, i) => tileEmoji(ch, solution, i)).reverse().join('')}
+                  {rowEmoji(solution, g)}
                 </Text>
               ))}
             </View>
@@ -94,6 +102,12 @@ export function GameResultModal({ visible, onClose, timeSeconds }: Props) {
           >
             <Text style={styles.btnShareText}>{STRINGS.shareResult} 📤</Text>
           </Pressable>
+
+          {shareNote !== '' && (
+            <Text style={styles.shareNote} accessibilityLiveRegion="polite">
+              {shareNote}
+            </Text>
+          )}
 
           <Pressable
             style={styles.btnClose}
@@ -203,6 +217,13 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.8 },
   btnShareText: { color: '#000', fontWeight: '700', fontFamily: FONTS.bold, fontSize: 16 },
+  shareNote: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+    fontFamily: FONTS.regular,
+    textAlign: 'center',
+    marginBottom: SPACING.xs,
+  },
   btnClose: {
     paddingVertical: SPACING.sm,
     alignItems: 'center',

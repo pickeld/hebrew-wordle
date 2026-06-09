@@ -12,6 +12,8 @@ export const STRINGS = {
   youLost: 'כמעט!',
   theSolutionWas: 'המילה הייתה',
   shareResult: 'שתף תוצאה',
+  resultCopied: 'התוצאה הועתקה ללוח',
+  shareFailed: 'השיתוף נכשל',
   playAgain: 'שחק שוב',
   notAWord: 'לא מילה תקנית',
   tooShort: 'המילה קצרה מדי',
