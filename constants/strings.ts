@@ -31,6 +31,11 @@ export const STRINGS = {
   howToPresent: 'האות נמצאת במילה אך במקום אחר.',
   howToAbsent: 'האות אינה נמצאת במילה כלל.',
   howToFooter: 'מילה חדשה מחכה לכם בכל יום!',
+
+  // Post-game / next puzzle
+  nextWordIn: 'המילה הבאה בעוד',
+  viewResult: 'הצג תוצאה',
+  gameOver: 'סיימת להיום',
   signIn: 'כניסה עם גוגל',
   signOut: 'יציאה',
   daily: 'יומי',
@@ -54,4 +59,5 @@ export const STRINGS = {
   a11yShare: 'שתף את התוצאה',
   a11yClose: 'סגור',
   a11yHelp: 'איך משחקים',
+  a11yViewResult: 'הצג שוב את תוצאת המשחק',
 };

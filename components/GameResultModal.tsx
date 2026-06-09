@@ -1,29 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal, View, Text, Pressable, StyleSheet, Share, Animated } from 'react-native';
+import { Modal, View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { COLORS, FONTS, RADIUS, SPACING, SHADOWS } from '../constants/theme';
 import { STRINGS } from '../constants/strings';
 import { useGameStore } from '../store/useGameStore';
-
-function tileEmoji(ch: string, solution: string, i: number): string {
-  const sol = [...solution];
-  if (ch === sol[i]) return '🟩';
-  if (sol.includes(ch)) return '🟨';
-  return '⬛';
-}
-
-function buildShareText(solution: string, guesses: string[], won: boolean): string {
-  const emoji = won ? '🎉 ניצחתי!' : '😔 הפסדתי';
-  const header = `וורדל עברי ${emoji} (${guesses.length}/6)`;
-  const board = guesses
-    .map((g) =>
-      [...g]
-        .map((ch, i) => tileEmoji(ch, solution, i))
-        .reverse()
-        .join('')
-    )
-    .join('\n');
-  return `${header}\n${board}`;
-}
+import { tileEmoji, shareResult } from '../lib/share';
+import { useNextPuzzleCountdown } from '../lib/time';
 
 interface Props {
   visible: boolean;
@@ -37,6 +18,7 @@ export function GameResultModal({ visible, onClose, timeSeconds }: Props) {
 
   const scale = useRef(new Animated.Value(0.8)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const countdown = useNextPuzzleCountdown(visible);
 
   useEffect(() => {
     if (visible) {
@@ -50,7 +32,7 @@ export function GameResultModal({ visible, onClose, timeSeconds }: Props) {
   }, [visible]);
 
   async function handleShare() {
-    await Share.share({ message: buildShareText(solution, guesses, won) });
+    await shareResult(solution, guesses, won);
   }
 
   const mins = Math.floor(timeSeconds / 60);
@@ -96,6 +78,12 @@ export function GameResultModal({ visible, onClose, timeSeconds }: Props) {
               <Text style={styles.statValue}>{timeStr}</Text>
               <Text style={styles.statLabel}>{STRINGS.time}</Text>
             </View>
+          </View>
+
+          {/* Countdown to the next daily puzzle */}
+          <View style={styles.countdownRow}>
+            <Text style={styles.countdownLabel}>{STRINGS.nextWordIn}</Text>
+            <Text style={styles.countdownValue}>{countdown}</Text>
           </View>
 
           <Pressable
@@ -181,7 +169,25 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     width: '100%',
     marginTop: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  countdownRow: {
+    alignItems: 'center',
     marginBottom: SPACING.lg,
+  },
+  countdownLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontFamily: FONTS.regular,
+    marginBottom: 2,
+  },
+  countdownValue: {
+    color: COLORS.accent,
+    fontSize: 24,
+    fontFamily: FONTS.bold,
+    letterSpacing: 1,
+    // Tabular feel so the digits don't jitter as they tick.
+    fontVariant: ['tabular-nums'],
   },
   statBox: { flex: 1, alignItems: 'center' },
   statDivider: { width: 1, height: 32, backgroundColor: COLORS.border },

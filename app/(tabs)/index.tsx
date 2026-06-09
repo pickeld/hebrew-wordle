@@ -10,6 +10,7 @@ import { AdBanner } from '../../components/AdBanner';
 import { GameResultModal } from '../../components/GameResultModal';
 import { HintDialog } from '../../components/HintDialog';
 import { HowToPlayModal } from '../../components/HowToPlayModal';
+import { PostGamePanel } from '../../components/PostGamePanel';
 import { useGame } from '../../hooks/useGame';
 import { showRewarded, showInterstitial } from '../../admob/ads';
 import { COLORS, FONTS, RADIUS, SPACING } from '../../constants/theme';
@@ -149,13 +150,17 @@ export default function HomeScreen() {
         </Pressable>
       )}
 
-      {/* Keyboard */}
+      {/* Keyboard while playing; post-game panel once the game is over */}
       <View style={styles.keyboardArea}>
-        <HebrewKeyboard
-          onLetter={addLetter}
-          onDelete={deleteLetter}
-          onSubmit={handleSubmit}
-        />
+        {gameStatus === 'playing' ? (
+          <HebrewKeyboard
+            onLetter={addLetter}
+            onDelete={deleteLetter}
+            onSubmit={handleSubmit}
+          />
+        ) : (
+          <PostGamePanel onViewResult={() => setShowResult(true)} />
+        )}
       </View>
 
       {/* Banner ad */}
