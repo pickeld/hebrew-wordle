@@ -101,11 +101,18 @@ export function GameResultModal({ visible, onClose, timeSeconds }: Props) {
           <Pressable
             style={({ pressed }) => [styles.btnShare, pressed && styles.pressed]}
             onPress={handleShare}
+            accessibilityRole="button"
+            accessibilityLabel={STRINGS.a11yShare}
           >
             <Text style={styles.btnShareText}>{STRINGS.shareResult} 📤</Text>
           </Pressable>
 
-          <Pressable style={styles.btnClose} onPress={onClose}>
+          <Pressable
+            style={styles.btnClose}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={STRINGS.a11yClose}
+          >
             <Text style={styles.btnCloseText}>{STRINGS.close}</Text>
           </Pressable>
         </Animated.View>

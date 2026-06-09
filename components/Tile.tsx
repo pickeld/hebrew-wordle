@@ -19,6 +19,15 @@ const STATE_BORDER: Record<LetterState, string> = {
   tbd: COLORS.accentDim,
 };
 
+// Hebrew descriptions read aloud by screen readers for each graded tile.
+const STATE_A11Y: Record<LetterState, string> = {
+  correct: 'במקום הנכון',
+  present: 'במילה אך במקום שגוי',
+  absent: 'לא במילה',
+  empty: '',
+  tbd: '',
+};
+
 interface TileProps {
   letter: string;
   state: LetterState;
@@ -111,8 +120,14 @@ export function Tile({ letter, state, index, revealed = false, win = false }: Ti
   // While typing, give the filled (tbd) tile a slightly stronger border.
   const isFilled = state === 'tbd' && !!letter;
 
+  // Only graded tiles convey meaning to screen readers; empty/typing tiles stay silent.
+  const a11yDesc = revealed ? STATE_A11Y[state] : '';
+  const a11yLabel = letter && a11yDesc ? `${letter}, ${a11yDesc}` : letter || undefined;
+
   return (
     <Animated.View
+      accessible={!!a11yLabel}
+      accessibilityLabel={a11yLabel}
       style={[
         styles.tile,
         win && SHADOWS.glow,

@@ -37,4 +37,11 @@ export const STRINGS = {
   joinChallenge: 'הצטרף לאתגר',
   challengeCode: 'קוד אתגר',
   joinTournament: 'הצטרף לטורניר',
+
+  // Accessibility labels (screen readers)
+  a11ySubmit: 'אישור הניחוש',
+  a11yDelete: 'מחק אות',
+  a11yHint: 'צפה בפרסומת לקבלת רמז',
+  a11yShare: 'שתף את התוצאה',
+  a11yClose: 'סגור',
 };

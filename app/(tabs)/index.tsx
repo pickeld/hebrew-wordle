@@ -120,6 +120,8 @@ export default function HomeScreen() {
           { opacity: toastOpacity, transform: [{ translateY: toastTranslate }] },
         ]}
         pointerEvents="none"
+        accessibilityLiveRegion="polite"
+        accessibilityRole="alert"
       >
         <Text style={styles.toastText}>{toastMsg}</Text>
       </Animated.View>
@@ -129,6 +131,8 @@ export default function HomeScreen() {
         <Pressable
           style={({ pressed }) => [styles.hintBtn, pressed && styles.hintBtnPressed]}
           onPress={() => setShowHintDialog(true)}
+          accessibilityRole="button"
+          accessibilityLabel={STRINGS.a11yHint}
         >
           <Text style={styles.hintBtnText}>💡 {STRINGS.watchAdForHint}</Text>
         </Pressable>

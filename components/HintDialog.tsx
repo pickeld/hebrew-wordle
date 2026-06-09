@@ -46,11 +46,18 @@ export function HintDialog({ visible, onCancel, onConfirm }: Props) {
           <Pressable
             style={({ pressed }) => [styles.btnConfirm, pressed && styles.pressed]}
             onPress={onConfirm}
+            accessibilityRole="button"
+            accessibilityLabel={STRINGS.watchAd}
           >
             <Text style={styles.btnConfirmText}>▶  {STRINGS.watchAd}</Text>
           </Pressable>
 
-          <Pressable style={styles.btnCancel} onPress={onCancel}>
+          <Pressable
+            style={styles.btnCancel}
+            onPress={onCancel}
+            accessibilityRole="button"
+            accessibilityLabel={STRINGS.cancel}
+          >
             <Text style={styles.btnCancelText}>{STRINGS.cancel}</Text>
           </Pressable>
         </Animated.View>

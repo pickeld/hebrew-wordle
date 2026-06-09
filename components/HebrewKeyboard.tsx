@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { View, Text, Pressable, Animated, StyleSheet } from 'react-native';
 import { COLORS, FONTS, SIZES, RADIUS, SHADOWS } from '../constants/theme';
+import { STRINGS } from '../constants/strings';
 import { useGameStore } from '../store/useGameStore';
 import type { LetterState } from '../types';
 
@@ -25,9 +26,10 @@ interface KeyProps {
   wide?: boolean;
   small?: boolean;
   onPress: () => void;
+  a11yLabel?: string;
 }
 
-function Key({ label, bg, wide, small, onPress }: KeyProps) {
+function Key({ label, bg, wide, small, onPress, a11yLabel }: KeyProps) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const pressIn = () =>
@@ -56,6 +58,8 @@ function Key({ label, bg, wide, small, onPress }: KeyProps) {
         onPressIn={pressIn}
         onPressOut={pressOut}
         android_disableSound={false}
+        accessibilityRole="button"
+        accessibilityLabel={a11yLabel ?? label}
         style={[
           styles.key,
           wide && styles.keyWide,
@@ -86,10 +90,10 @@ export function HebrewKeyboard({ onSubmit, onDelete, onLetter }: Props) {
         <View key={rowIdx} style={styles.row}>
           {row.map((key) => {
             if (key === 'ENTER') {
-              return <Key key={key} label="אישור" bg={COLORS.accentDim} wide small onPress={onSubmit} />;
+              return <Key key={key} label="אישור" a11yLabel={STRINGS.a11ySubmit} bg={COLORS.accentDim} wide small onPress={onSubmit} />;
             }
             if (key === 'DEL') {
-              return <Key key={key} label="⌫" bg={COLORS.surfaceAlt} wide onPress={onDelete} />;
+              return <Key key={key} label="⌫" a11yLabel={STRINGS.a11yDelete} bg={COLORS.surfaceAlt} wide onPress={onDelete} />;
             }
             const state: LetterState = letterStates[key] ?? 'empty';
             return (
